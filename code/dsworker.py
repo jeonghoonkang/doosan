@@ -29,9 +29,10 @@ def check_values(points, value):
 			s += p[1]
 
 		y = s / float(sz)
-		diff = ( value - y ) / y  
-		if abs(diff) > 0.1:
-			return False
+		if y > 0:
+			diff = ( value - y ) / y  
+			if abs(diff) > 0.1:
+				return False
 						
 	return True
 
