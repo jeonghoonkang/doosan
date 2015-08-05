@@ -235,13 +235,6 @@ def series(request):
         return HttpResponse(json.dumps(res).encode('utf-8'), content_type="application/javascript")
 
 
-def chart(request):
-    url = 'http://apollo-na-uploads.s3.amazonaws.com/1421911606908/Chart.jpg'
-    contents = urllib2.urlopen(url).read()
-    mimetype = mimetypes.guess_type(url)
-    return HttpResponse(contents, content_type=mimetype)
-
-
 def listQueries(request):
     queryParams = []
 

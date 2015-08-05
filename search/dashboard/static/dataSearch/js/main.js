@@ -785,30 +785,6 @@ $(function(){
 		updateChart();
 	}
 	
-	function queryForChart(startDateTime, endDateTime, streams, scale)
-	{
-		var width  = Math.floor( 1024 * scale );
-		var height = Math.floor( 512 * scale );
-
-		var query = "/dashboard/chart/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
-
-		// metric names
-		var metrics = ''
-		for( var i = 0; i < streams.length; ++i ) {
-			var s = streams[i];
-			metrics += s.metric;
-			if (i < streams.length - 1) {
-				metrics += ',';
-			}
-		}
-		query += '&m=' + metrics;
-
-		// size
-		query += "&size=" + width + "x" + height;
-
-		return query;
-	}
-	
 	function queryForSeries(startDateTime, endDateTime, streams, aggregator)
 	{
 		var query = "/dashboard/series/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
@@ -949,10 +925,9 @@ $(function(){
 	  
 	  			$("#chart").append( html );
 	  
-				var img = $('<img id="' + imageName + '">');
-				img.attr( 'src', queryForChart(startDateTime, endDateTime, streams, 1.0));
-				img.appendTo( '#' + bodyName );		
-				$("#" + imageName ).load(function(){
+				var div = $('<div id="' + imageName + '">');
+				div.appendTo( '#' + bodyName );
+				addChartToDiv(imageName, startDateTime, endDateTime, streams, function(){
 					// 로딩바를 가린다.
 					$("#" + loadingName).hide();
 				});
@@ -1018,7 +993,76 @@ $(function(){
 			text.appendTo( "#chart" );
 		}
 	}
-	
+
+	function addChartToDiv(divID, startDateTime, endDateTime, streams, callback)
+	{
+		var group_by = ((endDateTime.getTime() - startDateTime.getTime()) / 1000.0) / 100.0;
+		var query = queryForSeries(startDateTime, endDateTime, streams, aggregator='mean-'+group_by + 's');
+		$.ajax({
+			url: query,
+			dataType: "json",
+			success: function(series) {
+				var data = [];
+				for(var series_name in series) {
+					if (series.hasOwnProperty(series_name)) {
+						arr = [];
+						pairs = series[series_name];
+						for ( var i = 0; i < pairs.length; ++i ) {
+							var t = pairs[i][0];
+							var v = pairs[i][1];
+							arr.push([t * 1000, v])
+						}
+						data.push({
+							label: series_name,
+							data: arr
+						});
+					}
+				}
+
+				//
+				var options = {
+					colors: ['#7fb36d', '#eab838', '#6ed0e0', '#ef843c', '#e24d42'],
+					shadowSize: 0.0,
+					grid: {
+						show: true,
+						borderWidth: 0.0,
+					},
+					legend: {
+						show: true,
+					},
+					xaxis: {
+						mode: 'time',
+						timezone: 'browser',
+					},
+					yaxis: {
+						tickFormatter: function(value, axis) {
+							return value;
+						}
+					},
+					series: {
+						stack: false,
+						lines: {
+							show: true,
+							lineWidth: 0.5,
+							fill: 0,
+							stack: false,
+						},
+					}
+				};
+				options.xaxis.max = endDateTime.getTime();
+				options.xaxis.min = startDateTime.getTime();
+				$('#' + divID).width(800);
+				$('#' + divID).height(250);
+				$.plot($('#' + divID), data, options);
+				callback();
+			},
+			error: function(ajaxContext) {
+				console.log(ajaxContext);
+				alert("데이터 수신에 실패하였습니다.\n(에러: " + ajaxContext.responseText + ")");
+			}
+		});
+	}
+
 	function saveStreams(title, startDateTime, endDateTime, streams)
 	{
 		var query = queryForSeries(startDateTime, endDateTime, streams);
