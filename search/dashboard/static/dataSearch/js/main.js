@@ -21,7 +21,6 @@ $(function(){
 	var      searchType           = "basic";
 	var      g_initialUpdate      = false;
 	
-	var      analysisSelectedStream = null; 
 	///////////////////////////////////////////////////////////////////////////////
 	//// Methods
 	
@@ -31,19 +30,16 @@ $(function(){
 		return title
 	}
 
-	
 	function selectTab( index ) 
 	{
 		if ( index == 0 ) {
 	    	$("#tab1").addClass( "active" );
 	    	$("#tab2").removeClass( "active" );
 	    	$("#tab3").removeClass( "active" );
-	    	$("#tab4").removeClass( "active" );
-	    	
+
 	    	$("#searchPage").show();
 	    	$("#metricsPage").hide();
 	    	$("#chartPage").hide();
-	    	$("#analysisPage" ).hide();
 
 	    	//
 	    	initSearchPage();
@@ -52,13 +48,11 @@ $(function(){
 	    	$("#tab1").removeClass( "active" );
 	    	$("#tab2").addClass( "active" );
 	    	$("#tab3").removeClass( "active" );
-	    	$("#tab4").removeClass( "active" );
-	
+
 	    	$("#searchPage").hide();
 	    	$("#metricsPage").show();
 	    	$("#chartPage").hide();
-	    	$("#analysisPage" ).hide();
-	    	
+
 	    	//
 	    	metricBadgeValue = 0;
 	    	updateMetricBadgeValue();
@@ -68,13 +62,11 @@ $(function(){
 	    	$("#tab1").removeClass( "active" );
 	    	$("#tab2").removeClass( "active" );
 	    	$("#tab3").addClass( "active" );
-	    	$("#tab4").removeClass( "active" );
-	    	
+
 	    	$("#searchPage").hide();
 	    	$("#metricsPage").hide();
 	    	$("#chartPage").show();
-	    	$("#analysisPage" ).hide();
-	    	
+
 	    	//
 	    	updateChart();
 	    	
@@ -84,7 +76,6 @@ $(function(){
 
 		tabIndex = index;
 	}
-	
 	
 	function initSearchPage()
 	{
@@ -121,7 +112,6 @@ $(function(){
 		}		
 		return false;
 	}
-
 
 	function keywordsFromInputText( text )
 	{
@@ -261,15 +251,13 @@ $(function(){
 		updatePageNavigator();
 	}
 	
-	
 	function pageNavigatorClicked( page )
 	{
 		currentPage = page;
 		updatePageNavigator();
 		updateSearchResult();
 	}
-	
-	
+
 	function prevPageClicked()
 	{
 		var nextPage = currentPage - 10;
@@ -279,8 +267,7 @@ $(function(){
 		
 		pageNavigatorClicked( nextPage );
 	}
-	
-	
+
 	function nextPageClicked()
 	{
 		var nextPage = currentPage + 10;
@@ -290,8 +277,7 @@ $(function(){
 		
 		pageNavigatorClicked( nextPage );
 	}
-	
-	
+
 	function updatePageNavigator()
 	{
 		if ( maxPages == 0 ) {
@@ -663,7 +649,6 @@ $(function(){
 					       '<dl class="dl-horizontal">' +
 						   '<dt>Metric</dt>' +
 						   '<dd>' + stream.metric + '</dd>' +
-						   '<dt>Tags</dt>' +
 						   '<dt>Keywords</dt>' +
 						   '<dd class="keywords">' + keywordText + '</dd>';
 
@@ -754,8 +739,7 @@ $(function(){
 			}
 		}
 	}
-	
-	
+
 	function formatDate( t )
 	{
 		function fmt(m) {
@@ -801,41 +785,53 @@ $(function(){
 		updateChart();
 	}
 	
-	function chartQueryForStreams( startDateTime, endDateTime, streams, scale ) ///// TODO: 구현할 것.
+	function queryForChart(startDateTime, endDateTime, streams, scale)
 	{
 		var width  = Math.floor( 1024 * scale );
 		var height = Math.floor( 512 * scale );
-		
-		
-		var query = "http://121.78.237.160:4242/q?start=" + formatDate( startDateTime ) + 
-		            "&end=" + formatDate( endDateTime );
-		            
+
+		var query = "/dashboard/chart/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
+
+		// metric names
+		var metrics = ''
 		for( var i = 0; i < streams.length; ++i ) {
 			var s = streams[i];
-			query += "&m=avg:" + s.metric;
-			query += "&o=";
+			metrics += s.metric;
+			if (i < streams.length - 1) {
+				metrics += ',';
+			}
 		}
+		query += '&m=' + metrics;
 
-		query += "&wxh=" + width + "x" + height + "&png";		
+		// size
+		query += "&size=" + width + "x" + height;
+
 		return query;
 	}
 	
-	function asciiQueryForStreams( startDateTime, endDateTime, streams ) ////TODO: 현재 쿼리에 맞게 수정할 것.
+	function queryForSeries(startDateTime, endDateTime, streams, aggregator)
 	{
-		var query = "http://121.78.237.160:8080/dashboard/queryJSONP/?start=" + formatDate( startDateTime ) + 
-		            "&end=" + formatDate( endDateTime );
-		            
+		var query = "/dashboard/series/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
+
+		// metric names
+		var metrics = ''
 		for( var i = 0; i < streams.length; ++i ) {
 			var s = streams[i];
-			query += "&m=avg:" + s.metric;
-			query += "&o=";
+			metrics += s.metric;
+			if (i < streams.length - 1) {
+				metrics += ',';
+			}
 		}
+		query += '&m=' + metrics;
 
-		query += "&ascii";		
+		// aggregator
+		if (aggregator) {
+			query += '&agg=' + aggregator;
+		}
 		return query;
 	}	
 	
-	function stringToDateTime( q ) //    yyyy/mm/dd-HH:MM:SS
+	function stringToDateTime( q ) // yyyy/mm/dd-HH:MM:SS
 	{
 		var arr = q.split("-");
 		var arr2 = arr[0].split( "/" );
@@ -954,7 +950,7 @@ $(function(){
 	  			$("#chart").append( html );
 	  
 				var img = $('<img id="' + imageName + '">');
-				img.attr( 'src', chartQueryForStreams( startDateTime, endDateTime, streams, 1.0 ) );
+				img.attr( 'src', queryForChart(startDateTime, endDateTime, streams, 1.0));
 				img.appendTo( '#' + bodyName );		
 				$("#" + imageName ).load(function(){
 					// 로딩바를 가린다.
@@ -1023,36 +1019,38 @@ $(function(){
 		}
 	}
 	
-	function saveStreams( title, startDateTime, endDateTime, streams )
+	function saveStreams(title, startDateTime, endDateTime, streams)
 	{
-		var query = asciiQueryForStreams( startDateTime, endDateTime, streams );
+		var query = queryForSeries(startDateTime, endDateTime, streams);
 		alert( "TSD 로 ascii 데이터를 요청합니다.\n(쿼리: " + query + ")" );
 		$.ajax({
 			url: query,
-			dataType: "jsonp",
-			success: function( lines ) {
+			dataType: "json",
+			success: function(series) {
 				var text = "";
-				for ( var i = 0; i < lines.length; ++i ) {
-					var line = lines[i];
-					for ( var j = 0; j < line.length; ++j ) {
-						var s = line[j];
-						
-						if ( j < line.length - 1 ) {
-							text += s + ",";
-						}
-						else {
-							text += s + "\n";
+
+				for(var series_name in series) {
+					if (series.hasOwnProperty(series_name)) {
+						pairs = series[series_name];
+						for ( var i = 0; i < pairs.length; ++i ) {
+							var t = pairs[i][0];
+							var v = pairs[i][1];
+							text += series_name + ',' + t + ',' + v + '\n';
 						}
 					}
 				}
+
 				//
-				var blob = new Blob( [ text ], {type:"text/plain;charset=utf-8"});
-				saveAs( blob, title );
-				alert ( "저장되었습니다.\n(파일명: " + title + ")" );
+				console.log(text);//
+
+				//
+				var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+				saveAs(blob, title);
+				alert("저장되었습니다.\n(파일명: " + title + ")");
 			},
 			error: function( ajaxContext ) {
 				console.log( ajaxContext );
-				alert( "데이터 수신에 실패하였습니다.\n(에러: " + ajaxContext.responseText + ")" );
+				alert("데이터 수신에 실패하였습니다.\n(에러: " + ajaxContext.responseText + ")");
 			}
 		});
 

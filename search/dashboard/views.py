@@ -4,6 +4,7 @@
 import urllib2
 import json
 import datetime
+import mimetypes
 
 from django.http import HttpResponse, Http404
 from django.template import Context, loader
@@ -173,17 +174,6 @@ def removeFavoriteQuery(request):
     return HttpResponse("[false]", content_type="application/javascript")
 
 
-@login_required(login_url='/frontauth/login/')
-def devIndex(request):
-    template = loader.get_template("search.html")
-    context = Context({
-        'user': request.user,
-        'streams': _getAllStreamsString()
-    })
-
-    return HttpResponse(template.render(context))
-
-
 def make_response(code, result=None):
     res = {
         "code": code,
@@ -202,24 +192,39 @@ def make_response(code, result=None):
     return response
 
 
-def query(request):
+def series(request):
+    # start
     start = request.REQUEST.get("start", None)
     try:
         start = datetime.datetime.strptime(start, "%Y/%m/%d-%H:%M:%S")
     except (ValueError, TypeError):
         return make_response(error.CODE_INVALID_PARAMETERS)
 
+    # end
     end = request.REQUEST.get("end", None)
     try:
         end = datetime.datetime.strptime(end, "%Y/%m/%d-%H:%M:%S")
     except (ValueError, TypeError):
         return make_response(error.CODE_INVALID_PARAMETERS)
 
+    # metrics
     m = request.REQUEST.get("m", None)
     if m is None:
         return make_response(error.CODE_INVALID_PARAMETERS)
 
-    res = tsdb.get_series(m, start, end)
+    # aggregator
+    aggregator = request.REQUEST.get("agg", None)
+    if aggregator:
+        aggregator, group_by = aggregator.split('-')
+
+    else:
+        aggregator = None
+        group_by = None
+
+    # retreive
+    res = {}
+    for series_name in m.split(','):
+        res[series_name] = tsdb.get_series(series_name, start, end, aggregator=aggregator, group_by=group_by)
 
     callback = request.REQUEST.get("callback", None)
     if callback:
@@ -228,6 +233,13 @@ def query(request):
 
     else:
         return HttpResponse(json.dumps(res).encode('utf-8'), content_type="application/javascript")
+
+
+def chart(request):
+    url = 'http://apollo-na-uploads.s3.amazonaws.com/1421911606908/Chart.jpg'
+    contents = urllib2.urlopen(url).read()
+    mimetype = mimetypes.guess_type(url)
+    return HttpResponse(contents, content_type=mimetype)
 
 
 def listQueries(request):

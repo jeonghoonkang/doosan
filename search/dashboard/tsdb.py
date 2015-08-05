@@ -21,7 +21,7 @@ def date_time_to_epoch(tm):
     return (tm - datetime.timedelta(hours=9) - datetime.datetime(1970, 1, 1)).total_seconds()
 
 
-def get_series(series, start, end, margin=0):
+def get_series(series, start, end, margin=0, aggregator=None, group_by=None):
     assert isinstance(start, datetime.datetime)
     assert isinstance(end, datetime.datetime)
 
@@ -31,7 +31,12 @@ def get_series(series, start, end, margin=0):
     t0 = date_time_to_influx_query_param(start)
     t1 = date_time_to_influx_query_param(end)
 
-    query = "select time, value from %s where time > '%s' and time < '%s' order asc" % (series, t0, t1)
+    if aggregator:
+        assert group_by
+        query = "select %s(value) from %s where time > '%s' and time < '%s' group by time(%s) order asc" % (aggregator, series, t0, t1, group_by)
+
+    else:
+        query = "select value from %s where time > '%s' and time < '%s' order asc" % (series, t0, t1)
 
     try:
         data = __db.query(query, 's')
@@ -42,7 +47,12 @@ def get_series(series, start, end, margin=0):
 
     res = []
     if len(data):
-        for (t, seq, v) in data[0]["points"]:
+        for entry in data[0]["points"]:
+            if len(entry) == 3:
+                t, seq, v = entry
+            else:
+                t, v = entry
+
             res.append((t, v))
 
     return res
