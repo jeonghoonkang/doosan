@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MEG DataHub</title>
+
+    <!-- Bootstrap -->
+    <link href="/static/dataSearch/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/dataSearch/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+	<link href="/static/dataSearch/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+	<link href="/static/dataSearch/slider/slider.css" rel="stylesheet" media="screen">
+	<link href="/static/dataSearch/css/main.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- Flurry -->
+    <script src="https://cdn.flurry.com/js/flurry.js"></script>
+  </head>
+  
+  <body>
+    <div class="container">
+		<br/>
+		<br/>
+		<div class="image-wrapper">
+			<img class="image" src="{{stream.image.file.url}}"/>
+			<img class="image-marker" src="/static/dataSearch/images/marker.png"/> 
+		</div>
+		<div class="btn-group">
+			<button id="saveButton" class="btn">Save</button>
+			<button id="cancelButton" class="btn">Cancel</button>
+		</div>
+    </div>
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/static/dataSearch/moment/moment.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/dataSearch/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+		$(function(){
+			var coordX = {{stream.coordX}};
+			var coordY = {{stream.coordY}};
+			
+			$(".image").click(function(e){
+				var x = e.pageX - $(this).offset().left;
+				var y = e.pageY - $(this).offset().top;
+				
+				coordX = x / $(this).width();
+				coordY = y / $(this).height();
+				
+				$(".image-marker").css({
+					top  : $(this).height() * coordY - 32,
+					left : $(this).width()  * coordX - 10
+				});
+			});
+
+			$(".image-marker").hide();
+			setTimeout(function(){
+				$(".image-marker").show();
+				$(".image-marker").css({
+					top  : $(".image").height() * coordY - 32,
+					left : $(".image").width()  * coordX - 10
+				});
+			}, 500 );
+			
+			$("#saveButton").click(function(){
+				window.location.href = "/dashboard/savePoint/{{stream.id}}/?coordX=" + coordX + "&coordY=" + coordY;
+			});
+			
+			$("#cancelButton").click(function(){
+				window.location.href = "/admin/Dashboard/stream/{{stream.id}}/";
+			});
+
+			$("body").fadeIn(10);
+		});
+    </script>
+  </body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MEG DataHub</title>
+
+    <!-- Bootstrap -->
+    <link href="/static/dataSearch/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/dataSearch/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+	<link href="/static/dataSearch/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+	<link href="/static/dataSearch/slider/slider.css" rel="stylesheet" media="screen">
+	<link href="/static/dataSearch/css/main.css" rel="stylesheet" media="screen">
+	<link href="/static/dataSearch/jQRangeSlider/css/classic.css" type="text/css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- Flurry -->
+    <script src="https://cdn.flurry.com/js/flurry.js"></script>
+  </head>
+  
+  <body>  
+    <div class="container">
+    	<!-- -->
+    	<div class="page-header">
+    		<h1>MEG DataHub <small>Data Search Application Prototype</small></h1>
+    	</div>
+    	
+    	<!-- tab -->
+		<ul class="nav nav-tabs">
+			<li id="tab1" class="active"><a>Search</a></li>
+			<li id="tab2"><a>Metrics<span id="metricBadge" class="badge"></span></a></li>
+			<li id="tab3"><a>Chart</a></li>
+			<li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+				Setting<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu" role="menu">
+					<li class="dropdown-header">{{user.email}}</li>
+					<li role="presentation"><a href="/frontauth/logout/">Sign out</a></li>
+					{% if user.is_staff %}
+						<li role="presentation" class="divider"></li>
+						<li role="presentation"><a href="/dashboard/purge/">Purge</a></li>
+					{% endif %}
+				</ul>
+			</li>
+		</ul>
+      
+		<!-- search -->
+		<div id="searchPage">
+			<!-- 검색 상자 -->
+			<br/><br/>
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+				    <div class="input-group">
+				      <input id="searchText" type="text" class="form-control">
+				      <div  id="dropDownButton" class="input-group-btn">
+				        <button id="searchButton" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="searchTypeName">전 체</span><span class="caret"></span></button>
+				        <ul class="dropdown-menu pull-right">
+				          <li class="dropdown-header">Searching Algorithms</li>
+				          <li><a id="searchTypeBasic">AND</a></li>
+				          <li><a id="searchTypeOR">OR</a></li>
+				          <li><a id="searchTypeFuzzy">Fuzzy</a></li>
+				          <li class="divider"></li>
+				          <li class="dropdown-header">Tools for results</li>
+				          <li class="tools"><a id="addCurrentPage">Add all streams in current page</a></li>
+				          <li class="tools"><a id="removeCurrentPage">Remove all streams in current page</a></li>
+				        </ul>
+				      </div>
+				    </div>
+				</div>
+			</div>
+
+			<!-- 검색 결과 -->
+			<br/>
+			<br/>
+			<p id="searchResultCount" class="text-muted"></p>
+			<!--
+			<input id="fuzzySlider" type="text" value="">	
+			-->
+			
+			<!-- 검색 결과 -->
+			<div id="searchResultContainer" class="list-group">
+			</div>
+			
+			<!-- 페이지 네비게이션 -->
+			<div class = "text-center">
+				<ul id="pageNavigator" class="pagination pagination-centered">
+				</ul>
+			</div>
+		</div>
+
+		<!-- metrics -->		
+		<div id="metricsPage">
+			<br/>
+			<br/>
+			<p id="selectedMetricsCount" class="text-muted"></p>
+			<div id="selectedMetricsContainer" class="list-group">
+			</div>
+		</div>
+		
+		
+		<!-- charts -->
+		<div id="chartPage">
+			<br/>
+			<br/>
+
+			<p class="text-muted">검색 기간을 설정하세요.</p>
+			
+			<!-- 슬라이더 
+			<br/><div class="dateRangeSlider" style="width:80%"></div><br/>
+			-->
+			
+			<div class="well">				
+				<!-- 날짜 선택기 -->
+				<div class="row">
+					<!-- 시작 날짜 -->
+					<div class="col-md-5 col-md-offset-1">
+						<div class="form-group">
+			                <div class='input-group date' id='startDateTimePicker'>
+			                    <input type='text' class="form-control" />
+			                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+			                    </span>
+			                </div>
+			            </div>
+					</div>
+					<!-- 종료 날짜 -->
+					<div class="col-md-5">
+						<div class="form-group">
+			                <div class='input-group date' id='endDateTimePicker'>
+			                    <input type='text' class="form-control" />
+			                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+			                    </span>
+			                </div>
+			            </div>
+					</div>
+				</div>
+				<!-- 날짜 슬라이더 -->			
+				<br/>
+				<div class="row">
+					<div class="col-md-10 col-md-offset-1">
+						<div class="dateRangeSlider"></div>
+					</div>
+				</div>
+			</div> 
+			<!-- 그래프 -->
+			<div id="chart" class="panel-group"></div>			
+		</div>
+    </div>
+    
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+    <script src="/static/dataSearch/moment/moment.min.js"></script>
+    <script src="/static/dataSearch/purl/purl.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/dataSearch/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/dataSearch/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/dataSearch/blob/Blob.js"></script>
+    <script src="/static/dataSearch/fileSaver/FileSaver.js"></script>
+    <script src="/static/dataSearch/fuse/Fuse-kmeg.js"></script>
+	<script src="/static/dataSearch/slider/slider.js"></script>
+	<script src="/static/dataSearch/jQRangeSlider/lib/jquery.mousewheel.min.js"></script>
+	<script src="/static/dataSearch/jQRangeSlider/jQDateRangeSlider-min.js"></script>
+    <script src="/static/dataSearch/js/main.js"></script>
+    <!-- <script src="/static/dataSearch/jstree/jstree.js"></script> -->
+    <script>
+    	$(function(){
+			FlurryAgent.startSession( "DW89M2FJJ3GP9ZSMCZMM" );
+			FlurryAgent.setUserId( "{{user.email}}" );
+		});
+		
+		var streams = {{streams|escape|safe}};
+		
+		
+    </script>
+  </body>
+</html>

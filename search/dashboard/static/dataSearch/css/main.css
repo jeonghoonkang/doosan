@@ -1,0 +1,30 @@
+div.container {
+	display: none;
+}
+
+#chart {
+	max-width: 100%;
+}
+
+#chart img {
+	max-width:100%;
+}
+
+img.image {
+	width: 600px; 
+}
+
+img.image-marker {
+	position: absolute;
+	width : 36px;
+	height: 32px;
+}
+
+div.image-wrapper {
+	position: relative;
+}
+
+dd.keywords {
+	overflow: auto;
+}
+	
