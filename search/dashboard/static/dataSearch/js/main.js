@@ -696,7 +696,7 @@ $(function(){
 					$("#favoriteQueryName").focus();
 					return;
 				}
-				var query = "/dashboard/addFavoriteQuery/?name=" + name + "&url=" + window.location.href;
+				var query = "/datahub/dashboard/addFavoriteQuery/?name=" + name + "&url=" + window.location.href;
 				
 				$.ajax({
 					url: query,
@@ -787,7 +787,7 @@ $(function(){
 	
 	function queryForSeries(startDateTime, endDateTime, streams, aggregator)
 	{
-		var query = "/dashboard/series/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
+		var query = "/datahub/dashboard/series/?start=" + formatDate(startDateTime) + "&end=" + formatDate(endDateTime);
 
 		// metric names
 		var metrics = ''
@@ -1156,7 +1156,7 @@ $(function(){
 	function removeFavoriteQuery( event, queryID, queryName )
 	{
 		if ( confirm( "Favorite query( \"" + queryName + "\" ) 을 삭제하시겠습니까?" ) ) {
-			var query = "/dashboard/removeFavoriteQuery/?id=" + queryID;
+			var query = "/datahub/dashboard/removeFavoriteQuery/?id=" + queryID;
 
 			$.ajax({
 				url: query,
@@ -1370,7 +1370,7 @@ $(function(){
 				}
 			});
 			
-			$("#categoryMenuContainer").hide();
+			$("#categoryMenuContainer").show();
 			$("#categoryMenuAnchor").html('Show&nbsp;<span class="glyphicon glyphicon-chevron-down"></span>');
 		}
 		else {

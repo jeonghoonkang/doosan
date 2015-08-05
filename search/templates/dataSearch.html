@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>두산 인프라코어 데이터 검색 어플리케이션</title>
+    <title>FEMS DataHub</title>
 
     <!-- Bootstrap -->
     <link href="/static/dataSearch/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +36,7 @@
     <div class="container">
     	<!-- -->
     	<div class="page-header">
-    		<h1>두산 인프라코어 <small>Data Search Application</small></h1>
+    		<h1>FEMS DataHub <small>Data Search Application</small></h1>
     	</div>
     	
     	<!-- tab -->
@@ -50,10 +50,10 @@
 				</a>
 				<ul id="advancedDropDownMenu" class="dropdown-menu" role="menu">
 					<li class="dropdown-header">{{user.email}}</li>
-					<li role="presentation"><a href="/frontauth/logout/">Sign out</a></li>
+					<li role="presentation"><a href="/datahub/frontauth/logout/">Sign out</a></li>
 					{% if user.is_staff %}
 						<li role="presentation" class="divider"></li>
-						<li role="presentation"><a href="/dashboard/purge/">Purge</a></li>
+						<li role="presentation"><a href="/datahub/dashboard/purge/">Purge</a></li>
 					{% endif %}
 				</ul>
 			</li>
@@ -224,7 +224,7 @@
 			
 			$(".container").show();
 			
-			init(); // 자바 스크립트 코드 초기화
+			//init(); // 자바 스크립트 코드 초기화
 		
 			// 자체 초기화 
 			FlurryAgent.startSession( "DW89M2FJJ3GP9ZSMCZMM" );
@@ -288,6 +288,8 @@
 				}
 				return res;
 			}
+
+			init();
 		}
 		
 		// 스트림 데이터를 로드한다.
@@ -296,7 +298,7 @@
 		document.body.appendChild( __loadingEl );
 
 		var __streamEl = document.createElement( 'script' );
-		__streamEl.src = "/dashboard/getAllStreams/?callback=onStreamDataLoaded";
+		__streamEl.src = "/datahub/dashboard/getAllStreams/?callback=onStreamDataLoaded";
 		document.body.appendChild(__streamEl);
 	</script>
   </body>

@@ -20,7 +20,7 @@ def loginview(request):
     return render_to_response('login.html', c)
 
 
-def auth_and_login(request, onsuccess='/', onfail='/frontauth/login/'):
+def auth_and_login(request, onsuccess='/datahub', onfail='/datahub/frontauth/login/'):
     user = authenticate(username=request.POST['email'], password=request.POST['password'])
     if user is not None:
         login(request, user)
@@ -29,8 +29,6 @@ def auth_and_login(request, onsuccess='/', onfail='/frontauth/login/'):
             next = request.POST["next"]
         except:
             next = None
-
-        print "###### next = " + str(next)
 
         if next:
             return redirect(next)
@@ -61,9 +59,9 @@ def sign_up_in(request):
         user = create_user(username=post['email'], email=post['email'], password=post['password'])
         return auth_and_login(request)
     else:
-        return redirect("/frontauth/login/")
+        return redirect("/datahub/frontauth/login/")
 
 
 def logoutview(request):
     logout(request)
-    return HttpResponseRedirect("/frontauth/login/")
+    return HttpResponseRedirect("/datahub/frontauth/login/")

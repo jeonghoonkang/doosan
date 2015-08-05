@@ -88,8 +88,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/usr/share/nginx/www/static/'
+STATIC_ROOT = '/usr/share/nginx/html/static/'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/datahub/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

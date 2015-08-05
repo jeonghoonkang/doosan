@@ -25,21 +25,7 @@ def urlopen(url):
     return urllib2.urlopen(url)
 
 
-# 캐쉬: 일단 local memory variable 로 캐싱함.
-g_cachedStreamsJSON = None
-g_cachedStreamObjects = None
-
-
 def _getAllStreamsString():
-    global g_cachedStreamsJSON
-    global g_cachedStreamObjects
-
-    if g_cachedStreamsJSON:
-        return g_cachedStreamsJSON
-
-
-    # 캐쉬가 없다면
-    print "no cache. read start."
     res = []
     backup = []
 
@@ -81,15 +67,8 @@ def _getAllStreamsString():
         res.append(s.toDictionary())
 
     # 결과를 캐싱한다.
-    g_cachedStreamObjects = res
     res = json.dumps(res).encode('utf-8')
-    g_cachedStreamsJSON = res
-
-    print "caching done."
     return res
-
-
-_getAllStreamsString()  # 런칭시 한번 해버림.
 
 
 def streamByStreamID(streamID):
@@ -99,8 +78,6 @@ def streamByStreamID(streamID):
 
 
 def purge(request):
-    global g_cachedStreamsJSON
-    g_cachedStreamsJSON = None
     return redirect('/')
 
 
@@ -134,7 +111,7 @@ def _places():
     return res
 
 
-@login_required(login_url='/frontauth/login/')
+@login_required(login_url='/datahub/frontauth/login/')
 def index(request):
     template = loader.get_template("dataSearch.html")
     context = Context({
@@ -281,7 +258,7 @@ def getAllOperators(request):
     return HttpResponse(json.dumps(res).encode('utf-8'))
 
 
-@login_required(login_url='/admin/')
+@login_required(login_url='/datahub/admin/')
 def pickPoint(request, streamID):
     if not request.user.is_staff:
         raise Http404
@@ -294,7 +271,7 @@ def pickPoint(request, streamID):
     return HttpResponse(template.render(context))
 
 
-@login_required(login_url='/admin/')
+@login_required(login_url='/datahub/admin/')
 def savePoint(request, streamID):
     if not request.user.is_staff:
         raise Http404
@@ -304,4 +281,4 @@ def savePoint(request, streamID):
     s.coordY = float(request.REQUEST.get('coordY', 0))
     s.save()
 
-    return redirect('/admin/Dashboard/stream/%s/' % streamID)
+    return redirect('/datahub/admin/Dashboard/stream/%s/' % streamID)
