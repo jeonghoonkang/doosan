@@ -997,7 +997,9 @@ $(function(){
 	function addChartToDiv(divID, startDateTime, endDateTime, streams, callback)
 	{
 		var group_by = ((endDateTime.getTime() - startDateTime.getTime()) / 1000.0) / 100.0;
-		var query = queryForSeries(startDateTime, endDateTime, streams, aggregator='mean-'+group_by + 's');
+                var s = new Date(startDateTime.getTime() - group_by * 1000 * 100 / 2);
+                var e = new Date(endDateTime.getTime() + group_by * 1000 * 100 / 2);
+                var query = queryForSeries(s, e, streams, aggregator='mean-'+group_by + 's');
 		$.ajax({
 			url: query,
 			dataType: "json",
