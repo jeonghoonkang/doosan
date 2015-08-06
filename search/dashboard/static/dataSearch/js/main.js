@@ -1020,15 +1020,26 @@ $(function(){
 				}
 
 				//
+				function showTooltip(x, y, contents) {
+        				$('<div id="tooltip">' + contents + '</div>').css( {
+            				  position: 'absolute', display: 'none', top: y + 5, left: x + 5,
+            				  border: '1px solid #fdd', padding: '2px', 'background-color': '#fee', opacity: 0.80
+        				 }).appendTo("body").fadeIn(200);
+  				}
+
+				//
 				var options = {
 					colors: ['#7fb36d', '#eab838', '#6ed0e0', '#ef843c', '#e24d42'],
 					shadowSize: 0.0,
 					grid: {
 						show: true,
 						borderWidth: 0.0,
+						hoverable: true,
+						clickable: true,
 					},
 					legend: {
 						show: true,
+						noColumns: 3,
 					},
 					xaxis: {
 						mode: 'time',
@@ -1051,9 +1062,19 @@ $(function(){
 				};
 				options.xaxis.max = endDateTime.getTime();
 				options.xaxis.min = startDateTime.getTime();
-				$('#' + divID).width(800);
-				$('#' + divID).height(250);
+				$('#' + divID).width('100%');
+				$('#' + divID).height('100%');
+				$('#' + divID).css('min-height', '400px');
 				$.plot($('#' + divID), data, options);
+
+				$("#" + divID).bind("plothover", function (event, pos, item) {
+    					$("#tooltip").remove();
+    					if (item) {    
+     						var x = item.datapoint[0].toFixed(2),y = item.datapoint[1].toFixed(2);
+      						showTooltip(item.pageX, item.pageY,item.series.label + " of " + x + " = " + y);
+    					}
+  				});
+
 				callback();
 			},
 			error: function(ajaxContext) {
@@ -1394,4 +1415,3 @@ $(function(){
 	updateFavoriteQueries = _updateFavoriteQueries;
 	
 });
-		
