@@ -49,7 +49,9 @@
 		$(function(){
 			var coordX = {{stream.coordX}};
 			var coordY = {{stream.coordY}};
-			
+
+			$(".container").show();
+
 			$(".image").click(function(e){
 				var x = e.pageX - $(this).offset().left;
 				var y = e.pageY - $(this).offset().top;

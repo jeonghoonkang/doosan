@@ -119,7 +119,7 @@ class Stream(models.Model):
     imageTag.allow_tags = True
 
     def get_absolute_url(self):
-        return u"/dashboard/pickPoint/%d/" % (self.id)
+        return u"/datahub/dashboard/pickPoint/%d/" % (self.id)
 
 
 class FavoriteQuery(models.Model):

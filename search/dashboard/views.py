@@ -281,4 +281,4 @@ def savePoint(request, streamID):
     s.coordY = float(request.REQUEST.get('coordY', 0))
     s.save()
 
-    return redirect('/datahub/admin/Dashboard/stream/%s/' % streamID)
+    return redirect('/datahub/admin/dashboard/stream/%s/' % streamID)
