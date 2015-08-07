@@ -1056,7 +1056,7 @@ $(function(){
 						stack: false,
 						lines: {
 							show: true,
-							lineWidth: 0.5,
+							lineWidth: 1.5,
 							fill: 0,
 							stack: false,
 						},
