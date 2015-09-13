@@ -53,6 +53,8 @@
 
 		var startTime = new Date();
 		var endTime = new Date();
+		var requestCount = 0;
+		var responseCount = 0;
 
 		function refreshTable() {
 			// update sums
@@ -152,6 +154,8 @@
 		}	
 
 		function downloadSeries(startDateTime, endDateTime, streams, callback) {
+			requestCount += 1;
+
 			var group_by = 1; // 1초
             var s = new Date(startDateTime.getTime());
             var e = new Date(endDateTime.getTime());
@@ -178,8 +182,15 @@
 					}
 					
 					var text = formatDate(s) + " ~ " + formatDate(e);
-					$("#log").html("Analyzing energy data in " + text + "...");
+					responseCount += 1;
+					if (responseCount < requestCount) {
+						$("#log").html("Analyzing energy data in " + text + "...");
 
+					}
+					else {
+						$("#log").html("Analyzing completed.");
+
+					}
 					callback(data);
 				},
 				error: function(ajaxContext) {
