@@ -12,7 +12,8 @@
   </head>
   <body>
   	<div class="container">
-	  	<h1 id="title">FEMS Analysis <small>Daily</small></h1>
+	  	<h1>FEMS Analysis <small>Total</small></h1>
+
 		<div class="panel panel-default">
 		  <div class="panel-heading">낭비량 (kWh)</div>
 		  <table class="table table-bordered">
@@ -30,61 +31,14 @@
 		  		 <tr><th>합계</th><td id="c2701-sum"></td><td id="c2702-sum"></td><td id="c2703-sum"></td><td id="c2704-sum"></td><td id="c2705-sum"></td><td id="all-sum"></td></tr>
 		  	</tbody>
 		  </table>
-		  <div id="time" class="panel-footer"></div>
+		  <div class="panel-footer"><span id="log"></span><span id="time" style="float:right"></span></div>
 		</div>
-		<ul class="list-group">
-			<li class="list-group-item">
-			  	<h4>야식 (00:00 ~ 00:50)</h4>
-				<div id="chart1"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>야간 휴식 (02:50 ~ 03:10)</h4>
-				<div id="chart2"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>조조식 (05:20 ~ 05:50)</h4>
-				<div id="chart3"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>110분 휴식 (06:10 ~ 08:00)</h4>
-				<div id="chart4"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>중식 (12:00 ~ 12:45)</h4>
-				<div id="chart5"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>휴식 (14:50 ~ 15:10)</h4>
-				<div id="chart6"></div>			
-			</li>
-			<li class="list-group-item">
-			  	<h4>110분 휴식 (18:10 ~ 20:00)</h4>
-				<div id="chart7"></div>			
-			</li>
-		</ul>
-		<button type="button" class="btn btn-default" onclick="document.location.href='/analysis'">Back</button>		
+		<button type="button" class="btn btn-default" onclick="document.location.href='/analysis'">Back</button>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/excanvas.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.colorhelpers.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.canvas.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.categories.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.crosshair.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.errorbars.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.fillbetween.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.image.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.navigate.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.pie.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.resize.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.selection.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.symbol.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.threshold.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.js"></script>
 	<script>
 		var energies = [
 			[0, 0, 0, 0, 0, 0],
@@ -99,25 +53,6 @@
 
 		var startTime = new Date();
 		var endTime = new Date();
-
-		var params = function() {
-		    function urldecode(str) {
-		        return decodeURIComponent((str+'').replace(/\+/g, '%20'));
-		    }
-
-		    function transformToAssocArray( prmstr ) {
-		        var params = {};
-		        var prmarr = prmstr.split("&");
-		        for ( var i = 0; i < prmarr.length; i++) {
-		            var tmparr = prmarr[i].split("=");
-		            params[tmparr[0]] = urldecode(tmparr[1]);
-		        }
-		        return params;
-		    }
-
-		    var prmstr = window.location.search.substr(1);
-		    return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
-		}();
 
 		function refreshTable() {
 			// update sums
@@ -216,8 +151,7 @@
 			return query;
 		}	
 
-		function addChartToDiv(divID, startDateTime, endDateTime, streams, callback) {
-			//var group_by = ((endDateTime.getTime() - startDateTime.getTime()) / 1000.0) / 100.0;
+		function downloadSeries(startDateTime, endDateTime, streams, callback) {
 			var group_by = 1; // 1초
             var s = new Date(startDateTime.getTime());
             var e = new Date(endDateTime.getTime());
@@ -242,62 +176,9 @@
 							});
 						}
 					}
-
-					//
-					function showTooltip(x, y, contents) {
-	        				$('<div id="tooltip">' + contents + '</div>').css( {
-	            				  position: 'absolute', display: 'none', top: y + 5, left: x + 5,
-	            				  border: '1px solid #fdd', padding: '2px', 'background-color': '#fee', opacity: 0.80
-	        				 }).appendTo("body").fadeIn(200);
-	  				}
-
-					//
-					var options = {
-						colors: ['#7fb36d', '#eab838', '#6ed0e0', '#ef843c', '#e24d42'],
-						shadowSize: 0.0,
-						grid: {
-							show: true,
-							borderWidth: 0.0,
-							hoverable: true,
-							clickable: true,
-						},
-						legend: {
-							show: true,
-							noColumns: 3,
-						},
-						xaxis: {
-							mode: 'time',
-							timezone: 'browser',
-						},
-						yaxis: {
-							tickFormatter: function(value, axis) {
-								return value;
-							}
-						},
-						series: {
-							stack: false,
-							lines: {
-								show: true,
-								lineWidth: 1.5,
-								fill: 0,
-								stack: false,
-							},
-						}
-					};
-					options.xaxis.max = endDateTime.getTime();
-					options.xaxis.min = startDateTime.getTime();
-					$('#' + divID).width('100%');
-					$('#' + divID).height('100%');
-					$('#' + divID).css('min-height', '400px');
-					$.plot($('#' + divID), data, options);
-
-					$("#" + divID).bind("plothover", function (event, pos, item) {
-	    					$("#tooltip").remove();
-	    					if (item) {    
-	     						var x = item.datapoint[0].toFixed(2),y = item.datapoint[1].toFixed(2);
-	      						showTooltip(item.pageX, item.pageY,item.series.label + " of " + x + " = " + y);
-	    					}
-	  				});
+					
+					var text = formatDate(s) + " ~ " + formatDate(e);
+					$("#log").html("Analyzing energy data in " + text + "...");
 
 					callback(data);
 				},
@@ -318,12 +199,13 @@
 			}
 			return res;
 		}
+
 		function updateCellValues(index, data) {
 
 			for (var i = 0; i < 5; ++i) {
 				for (var j = 0; j < data.length; ++j) {
 					if (data[j].label == streams[i]) {
-						energies[index][i] = integrate(data[j].data);						
+						energies[index][i] += integrate(data[j].data);						
 					}
 				}
 			}
@@ -331,51 +213,79 @@
 			refreshTable();
 		}
 
+		Date.prototype.addDays = function(days) {
+		    var dat = new Date(this.valueOf())
+		    dat.setDate(dat.getDate() + days);
+		    return dat;
+		}
+
+		function getDates(startDate, stopDate) {
+		    var dateArray = new Array();
+		    var currentDate = startDate;
+		    while (currentDate <= stopDate) {
+		        dateArray.push( new Date (currentDate) )
+		        currentDate = currentDate.addDays(1);
+		    }
+		    return dateArray;
+		}
+
+		function formatDateYYYYMMDD(date) {
+			date = new Date(date);
+
+			var day = ('0' + date.getDate()).slice(-2);
+			var month = ('0' + (date.getMonth() + 1)).slice(-2);
+			var year = date.getFullYear();
+
+			return year + '-' + month + '-' + day;
+		}
+
+		arr = getDates(new Date('2015-03-01'), new Date('2015-07-15'))
+
 		$(function(){
-			var date = params["date"];
-			$("#title").html("FEMS Analysis <small>" + date + "</small>");
+			for (var i = 0; i < arr.length; ++i) {
+				var date = formatDateYYYYMMDD(arr[i]);
+				var s = new Date(date + 'T00:00:00+09:00');
+				var e = new Date(date + 'T00:50:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(0, data);
+				});
 
-			var s = new Date(date + 'T00:00:00+09:00');
-			var e = new Date(date + 'T00:50:00+09:00');
-			addChartToDiv("chart1", s, e, streams, function(data){
-				updateCellValues(0, data);
-			});
+				s = new Date(date + 'T02:50:00+09:00');
+				e = new Date(date + 'T03:10:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(1, data);
+				});
+				
+				s = new Date(date + 'T05:20:00+09:00');
+				e = new Date(date + 'T05:50:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(2, data);
+				});
 
-			s = new Date(date + 'T02:50:00+09:00');
-			e = new Date(date + 'T03:10:00+09:00');
-			addChartToDiv("chart2", s, e, streams, function(data){
-				updateCellValues(1, data);
-			});
-			
-			s = new Date(date + 'T05:20:00+09:00');
-			e = new Date(date + 'T05:50:00+09:00');
-			addChartToDiv("chart3", s, e, streams, function(data){
-				updateCellValues(2, data);
-			});
+				s = new Date(date + 'T06:10:00+09:00');
+				e = new Date(date + 'T08:00:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(3, data);
+				});
 
-			s = new Date(date + 'T06:10:00+09:00');
-			e = new Date(date + 'T08:00:00+09:00');
-			addChartToDiv("chart4", s, e, streams, function(data){
-				updateCellValues(3, data);
-			});
+				s = new Date(date + 'T12:00:00+09:00');
+				e = new Date(date + 'T12:45:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(4, data);
+				});
 
-			s = new Date(date + 'T12:00:00+09:00');
-			e = new Date(date + 'T12:45:00+09:00');
-			addChartToDiv("chart5", s, e, streams, function(data){
-				updateCellValues(4, data);
-			});
+				s = new Date(date + 'T14:50:00+09:00');
+				e = new Date(date + 'T15:10:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(5, data);
+				});
 
-			s = new Date(date + 'T14:50:00+09:00');
-			e = new Date(date + 'T15:10:00+09:00');
-			addChartToDiv("chart6", s, e, streams, function(data){
-				updateCellValues(5, data);
-			});
-
-			s = new Date(date + 'T18:10:00+09:00');
-			e = new Date(date + 'T20:00:00+09:00');
-			addChartToDiv("chart7", s, e, streams, function(data){
-				updateCellValues(6, data);
-			});
+				s = new Date(date + 'T18:10:00+09:00');
+				e = new Date(date + 'T20:00:00+09:00');
+				downloadSeries(s, e, streams, function(data){
+					updateCellValues(6, data);
+				});
+			}
 		});
 
 	</script>
