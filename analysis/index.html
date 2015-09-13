@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>FEMS Analysis</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+  </head>
+  <body>
+  	<div class="container">
+	  	<h1>FEMS Analysis</h1>
+	  	<br/>
+		<ul id="list" class="list-group">
+		</ul>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/excanvas.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.colorhelpers.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.canvas.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.categories.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.crosshair.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.errorbars.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.fillbetween.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.image.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.navigate.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.pie.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.resize.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.selection.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.symbol.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.threshold.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.js"></script>
+	<script>
+		$(function(){
+			Date.prototype.addDays = function(days) {
+			    var dat = new Date(this.valueOf())
+			    dat.setDate(dat.getDate() + days);
+			    return dat;
+			}
+
+			function getDates(startDate, stopDate) {
+			    var dateArray = new Array();
+			    var currentDate = startDate;
+			    while (currentDate <= stopDate) {
+			        dateArray.push( new Date (currentDate) )
+			        currentDate = currentDate.addDays(1);
+			    }
+			    return dateArray;
+			}
+
+			function format(date) {
+				date = new Date(date);
+
+				var day = ('0' + date.getDate()).slice(-2);
+				var month = ('0' + (date.getMonth() + 1)).slice(-2);
+				var year = date.getFullYear();
+
+				return year + '-' + month + '-' + day;
+			}
+
+			arr = getDates(new Date('2015-03-01'), new Date('2015-07-15'))
+			for (var i = 0; i < arr.length; ++i) {
+				var t = format(arr[i]);
+				$("#list").append('<li class="list-group-item"><a href="daily.html?date=' + t + '">' + t + '</a></li>');
+			}
+		});
+	</script>
+  </body>
+</html>
